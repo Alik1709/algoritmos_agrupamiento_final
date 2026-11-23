@@ -3,7 +3,9 @@
 Plataforma de análisis ETL y agrupamiento jerárquico/distancias con arquitectura distribuida compuesta por:
 
 - **Gateway Python (`gateway-python/`):** API con FastAPI / Uvicorn (puerto `8000`) encargada de la ingesta de archivos (`.csv`, `.txt`, `.xlsx`, `.data`, `.docx`), diagnóstico ETL, recomendación de motor y orquestación.
-- **Microservicio Gower (`gower-java/`):** Servicio en Java / Spring Boot (puerto `8080`) para cálculo de distancia de Gower sobre variables mixtas.
+- **Gower en Java (puerto `8080`)
+Abre la carpeta `gower-java/` en **IntelliJ IDEA** (asegurándote de que reconozca el `pom.xml`) y ejecuta la clase principal anotada con `@SpringBootApplication`.
+*(Alternativa desde consola si tienes Maven instalado globalmente: `mvn spring-boot:run`).*
 - **Motor Binario en C (`c-binario/`):** Código fuente en C y `CMakeLists.txt` para similitud/distancia binaria.
 - **Motor Mahalanobis en C (`c-mahalanobis/`):** Código fuente en C y `CMakeLists.txt` para distancia de Mahalanobis.
 - **Frontend (`frontend/`):** Interfaz web (`index.html`, estilos y scripts) para carga de datos, validación ETL y visualización de resultados.
