@@ -1,0 +1,14 @@
+*.exe
+*.dll
+*.o
+*.obj
+*.class
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+target/
+build/
+cmake-build-*/
+.idea/
+.vscode/

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClusterHub | Sistema Políglota de Agrupamiento Jerárquico</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <span class="badge">POLYGLOT ENGINE</span>
+            <h1>Análisis de Agrupamiento Jerárquico</h1>
+        </div>
+        <div class="services-status" id="servicesStatus">
+            <span class="dot online"></span> Gateway Python
+            <span class="dot online"></span> C-Binario
+            <span class="dot online"></span> Java-Gower
+            <span class="dot online"></span> C-Mahalanobis
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>1. Ingesta de Datos y Pre-procesamiento (ETL)</h2>
+            <div class="upload-grid">
+                <div class="file-drop" id="dropZone">
+                    <input type="file" id="fileInput" accept=".csv,.txt,.xlsx,.xls,.data" hidden>
+                    <p>Arrastra tu archivo (<strong>.csv, .txt, .xlsx, .data</strong>) o <button type="button" id="btnSelectFile" class="btn-link">explora aquí</button></p>
+                    <span id="fileName" class="file-tag">Ningún archivo seleccionado</span>
+                </div>
+                <div class="options-panel">
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="hasHeader" checked>
+                        <span>El archivo contiene fila de encabezados</span>
+                    </label>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="hasIdCol" checked>
+                        <span>La primera columna es identificador (ID / Etiqueta)</span>
+                    </label>
+                    <div class="select-row">
+                        <label for="targetEnginePreview">Validar reglas para:</label>
+                        <select id="targetEnginePreview">
+                            <option value="AUTO">Detección Automática (Recomendación)</option>
+                            <option value="BINARY">Binario (C) - Solo 0 y 1</option>
+                            <option value="GOWER">Gower (Java) - Variables Mixtas</option>
+                            <option value="EUCLIDEAN">Euclidia (Python) - Numéricas</option>
+                            <option value="MAHALANOBIS">Mahalanobis (C) - Numéricas Correlacionadas</option>
+                        </select>
+                    </div>
+                    <button id="btnRunETL" class="btn-primary" disabled>Analizar y Validar Datos</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="etlSection" class="card hidden">
+            <h2>2. Diagnóstico de Variables, Reporte ETL y Matriz Limpia</h2>
+            
+            <div id="recommendationBanner" class="banner-info"></div>
+
+            <div class="two-cols">
+                <div>
+                    <h3>Bitácora de Transformación y Limpieza (ETL)</h3>
+                    <ul id="etlReportList" class="etl-log"></ul>
+                </div>
+                <div>
+                    <h3>Matriz de Datos Limpia (Post-ETL)</h3>
+                    <div class="table-wrapper">
+                        <table id="cleanMatrixTable"></table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="execution-bar">
+                <div class="control-group">
+                    <label for="engineSelect">Microservicio de Distancia:</label>
+                    <select id="engineSelect">
+                        <option value="BINARY">1. Binario — C (Sokal-Michener / Jaccard)</option>
+                        <option value="GOWER">2. Gower — Java (Variables Mixtas)</option>
+                        <option value="EUCLIDEAN">3. Euclidia — Python (Métrica L2)</option>
+                        <option value="MAHALANOBIS">4. Mahalanobis — C (Covarianza Inversa)</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="binaryMetricGroup">
+                    <label for="binarySubmetric">Coeficiente Binario:</label>
+                    <select id="binarySubmetric">
+                        <option value="JACCARD">Distancia Jaccard (1 - S_J)</option>
+                        <option value="SOKAL">Distancia Sokal-Michener (1 - S_SM)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="linkageSelect">Técnica de Eslabonamiento:</label>
+                    <select id="linkageSelect">
+                        <option value="VMC">Vecino Más Cercano (VMC / Single)</option>
+                        <option value="VML">Vecino Más Lejano (VML / Complete)</option>
+                        <option value="PROMEDIO">Promedio (UPGMA / Average)</option>
+                    </select>
+                </div>
+
+                <button id="btnExecuteClustering" class="btn-accent">Calcular Distancias y Agrupar</button>
+            </div>
+        </section>
+
+        <section id="resultsSection" class="card hidden">
+            <h2>3. Resultados del Agrupamiento (<span id="activeEngineLabel"></span>)</h2>
+
+            <div class="results-grid">
+                <div class="panel-box">
+                    <h3>Matriz de Distancias</h3>
+                    <div class="table-wrapper">
+                        <table id="distanceMatrixTable"></table>
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <h3>Relaciones (Menor a Mayor Distancia)</h3>
+                    <div class="table-wrapper max-h-300">
+                        <table id="sortedPairsTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Par de Elementos</th>
+                                    <th>Distancia</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-grid mt-20">
+                <div class="panel-box">
+                    <h3>Historial de Agrupamiento</h3>
+                    <div class="table-wrapper">
+                        <table id="historyTable">
+                            <thead>
+                                <tr>
+                                    <th>Etapa</th>
+                                    <th>Grupo 1</th>
+                                    <th>Grupo 2</th>
+                                    <th>Grupo N</th>
+                                    <th>COEF</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel-box">
+                    <h3>Dendrograma Sincronizado por Grupo</h3>
+                    <div class="canvas-container">
+                        <canvas id="dendrogramCanvas" width="700" height="420"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
